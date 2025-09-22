@@ -13,8 +13,8 @@ async function bootstrap() {
  });
 
  const config = new DocumentBuilder()
- .setTitle('TaskBoard API')
- .setDescription('CRUD de tareas')
+ .setTitle('Comandas API')
+ .setDescription('CRUD de productos')
  .setVersion('1.0')
  .build();
  const document = SwaggerModule.createDocument(app, config);

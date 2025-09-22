@@ -4,7 +4,7 @@ CREATE TYPE "public"."Tipo" AS ENUM ('BEBESTIBLE', 'COMESTIBLE');
 -- CreateTable
 CREATE TABLE "public"."Producto" (
     "id" TEXT NOT NULL,
-    "Nombre" TEXT NOT NULL,
+    "nombre" TEXT NOT NULL,
     "description" TEXT,
     "tipo" "public"."Tipo" NOT NULL DEFAULT 'COMESTIBLE',
     "dueDate" TIMESTAMP(3),

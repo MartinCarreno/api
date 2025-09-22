@@ -6,7 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  
 }
 
 datasource db {
@@ -16,7 +16,7 @@ datasource db {
 
 model Producto {
   id String @id @default(cuid())
-  Nombre String
+  nombre String?
   description String?
   tipo Tipo @default(COMESTIBLE)
   dueDate DateTime?

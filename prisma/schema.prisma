@@ -14,17 +14,67 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Producto {
+model User {
   id String @id @default(cuid())
+  email String @unique
   nombre String?
-  description String?
-  tipo Tipo @default(COMESTIBLE)
-  dueDate DateTime?
+  passwordHash String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Mesa {
+  id         String   @id @default(cuid())
+  numeroMesa Int      @unique
+  comanda    Comanda? // Relación 1:1 con la comanda activa
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Comanda {
+  id          String           @id @default(cuid())
+  description String?
+  mesa        Mesa             @relation(fields: [mesaId], references: [id])
+  mesaId      String           @unique // Solo una comanda activa por mesa
+  activo      Boolean          @default(true)
+  detalles    ComandaDetalle[]
+  comandaTotal ComandaTotal?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model ComandaDetalle {
+  id         String    @id @default(cuid())
+  comanda    Comanda   @relation(fields: [comandaId], references: [id], onDelete: Cascade)
+  comandaId  String
+  producto   Producto  @relation(fields: [productoId], references: [id])
+  productoId String
+  cantidad   Int       @default(1)
+  precio     Float?
+  observacion String?
+}
+
+model ComandaTotal {
+  id        String   @id @default(cuid())
+  comanda   Comanda  @relation(fields: [comandaId], references: [id])
+  comandaId String   @unique
+  total     Float    @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+model Producto {
+  id          String   @id @default(cuid())
+  nombre      String?
+  description String?
+  tipo        Tipo     @default(COMESTIBLE)
+  dueDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  detalles    ComandaDetalle[]
 }
 
 enum Tipo {
  BEBESTIBLE
  COMESTIBLE
 }
+

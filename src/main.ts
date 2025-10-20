@@ -16,6 +16,7 @@ async function bootstrap() {
  .setTitle('Comandas API')
  .setDescription('CRUD de productos')
  .setVersion('1.0')
+ .addBearerAuth()
  .build();
  const document = SwaggerModule.createDocument(app, config);
  SwaggerModule.setup('api/docs', app, document);

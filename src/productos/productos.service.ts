@@ -1,30 +1,30 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { CreateProductoDto } from './dto/create-producto.dto';
+import { UpdateProductoDto } from './dto/update-producto.dto';
 
 @Injectable()
 export class ProductosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
-  async create(data: any, userId: string) {
-    return (this.prisma as any).producto.create({
-      data: {
-        ...data,
-        userId
-      }
+  async create(dto: CreateProductoDto, userId: string) {
+    const { dueDate, ...rest } = dto;
+    return this.prisma.producto.create({
+      data: { ...rest, userId, dueDate: dueDate ? new Date(dueDate) : null },
     });
   }
 
   // ahora acepta userId y paginado
   async findAll(userId: string, skip = 0, take = 20) {
-    return (this.prisma as any).producto.findMany({
+    return this.prisma.producto.findMany({
       where: { userId },
-      skip,
-      take,
+      orderBy: { createdAt: 'desc' },
+      skip, take,
     });
   }
 
   async findOne(id: string, userId: string) {
-    const producto = await (this.prisma as any).producto.findFirst({
+    const producto = await this.prisma.producto.findFirst({
       where: {
         id,
         userId
@@ -38,17 +38,19 @@ export class ProductosService {
     return producto;
   }
 
-  async update(id: string, data: any, userId: string) {
+  async update(id: string, dto: UpdateProductoDto, userId: string) {
     // valida pertenencia
     await this.findOne(id, userId);
+    const { dueDate, ...rest } = dto;
     return (this.prisma as any).producto.update({
       where: { id },
-      data,
+      data: { ...rest, ...(dueDate !== undefined ? { dueDate: dueDate ? new Date(dueDate) : null } : {}) },
     });
   }
 
   async remove(id: string, userId: string) {
     await this.findOne(id, userId);
-    return (this.prisma as any).producto.delete({ where: { id } });
+    await this.prisma.producto.delete({ where: { id } });
+    return { ok: true };
   }
 }

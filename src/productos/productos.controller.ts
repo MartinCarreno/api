@@ -1,10 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { CurrentUser } from '../auth/decorators/user.decorator';
 import { ProductosService } from './productos.service';
 import { CreateProductoDto } from './dto/create-producto.dto';
 import { UpdateProductoDto } from './dto/update-producto.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+type JwtUser = { sub: string; email: string };
+@ApiTags('productos')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard) // <-- proteger todas las rutas del controlador
 @Controller('productos')
 export class ProductosController {
@@ -17,7 +21,7 @@ export class ProductosController {
 
   @Get()
   findAll(
-    @CurrentUser() user: { sub: string },
+    @CurrentUser() user: JwtUser,
     @Query('skip') skip = '0',
     @Query('take') take = '20',
   ) {
@@ -33,13 +37,13 @@ export class ProductosController {
   update(
     @Param('id') id: string,
     @Body() dto: UpdateProductoDto,
-    @CurrentUser() user: { sub: string },
+    @CurrentUser() user: JwtUser,
   ) {
     return this.productosService.update(id, dto, user.sub);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() user: { sub: string }) {
+  remove(@Param('id') id: string, @CurrentUser() user: JwtUser) {
     return this.productosService.remove(id, user.sub);
   }
 }

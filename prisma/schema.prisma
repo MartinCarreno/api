@@ -21,7 +21,7 @@ model User {
   passwordHash String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
+  productos Producto[]
   comandas Comanda[]    // <-- relación inversa
 }
 
@@ -80,6 +80,8 @@ model Producto {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   detalles    ComandaDetalle[]
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Tipo {

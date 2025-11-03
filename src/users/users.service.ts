@@ -10,7 +10,7 @@ export class UsersService {
         // Verificar email duplicado
         const exists = await this.prisma.user.findUnique({where: {email}});
         if (exists) {
-            throw new ConflictException('Email already exists');
+            throw new ConflictException('El Email ya esta en uso');
         }
 
         // Hash contraseña
@@ -27,14 +27,14 @@ export class UsersService {
         });       
     }
 
-    // Método requerido por la rúbrica
+    
     async findByEmail(email: string) {
         return this.prisma.user.findUnique({
             where: {email}
         });
     }
 
-    // Método requerido por la rúbrica
+    
     async findById(id: string) {
         return this.prisma.user.findUnique({
             where: {id}

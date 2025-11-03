@@ -21,6 +21,8 @@ model User {
   passwordHash String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  comandas Comanda[]    // <-- relación inversa
 }
 
 model Mesa {
@@ -37,10 +39,17 @@ model Comanda {
   mesa        Mesa             @relation(fields: [mesaId], references: [id])
   mesaId      String           @unique // Solo una comanda activa por mesa
   activo      Boolean          @default(true)
+
+  // Relación con User
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   detalles    ComandaDetalle[]
   comandaTotal ComandaTotal?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
+
+  @@index([userId])   // <-- índice
 }
 
 model ComandaDetalle {

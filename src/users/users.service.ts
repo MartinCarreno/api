@@ -1,24 +1,43 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
-    constructor (private prisma: PrismaService) {}
+    constructor(private prisma: PrismaService) {}
 
-    async create(email: string, password: string, nombre?: string){
+    async create(email: string, password: string, nombre?: string) {
+        // Verificar email duplicado
         const exists = await this.prisma.user.findUnique({where: {email}});
-        if (exists) throw new ConflictException('Email ya está en uso')
+        if (exists) {
+            throw new ConflictException('Email already exists');
+        }
 
-        const passwordHash = await bcrypt.hash(password, 10);
-        return this.prisma.user.create({data: {email, passwordHash, nombre}});
+        // Hash contraseña
+        const saltRounds = 10;
+        const passwordHash = await bcrypt.hash(password, saltRounds);
+
+        // Crear usuario
+        return this.prisma.user.create({
+            data: {
+                email,
+                passwordHash,
+                nombre
+            }
+        });       
     }
 
-    findByEmail(email: string) {
-        return this.prisma.user.findUnique({where: {email}});
+    // Método requerido por la rúbrica
+    async findByEmail(email: string) {
+        return this.prisma.user.findUnique({
+            where: {email}
+        });
     }
 
-    findById(id: string) {
-        return this.prisma.user.findUnique({where: {id}});
+    // Método requerido por la rúbrica
+    async findById(id: string) {
+        return this.prisma.user.findUnique({
+            where: {id}
+        });
     }
 }

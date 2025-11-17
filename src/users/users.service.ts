@@ -1,5 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
+import { $Enums } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -22,7 +23,8 @@ export class UsersService {
             data: {
                 email,
                 passwordHash,
-                nombre
+                nombre,
+                role: $Enums.Role.USER 
             }
         });       
     }

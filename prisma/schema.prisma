@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-
 }
 
 datasource db {
@@ -14,15 +13,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
-  id String @id @default(cuid())
-  email String @unique
-  nombre String?
+  id           String         @id @default(cuid())
+  email        String         @unique
+  nombre       String?
   passwordHash String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  productos Producto[]
-  comandas Comanda[]    // <-- relación inversa
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  productos    Producto[]
+  role         Role           @default(USER)
+  tokens       RefreshToken[]
+}
+
+model RefreshToken {
+  id                String   @id @default(cuid()) // JTI
+  tokenHash         String // hash del refresh
+  expiresAt         DateTime
+  revoked           Boolean  @default(false)
+  replacedByTokenId String?
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Mesa {
@@ -34,32 +51,26 @@ model Mesa {
 }
 
 model Comanda {
-  id          String           @id @default(cuid())
+  id          String  @id @default(cuid())
   description String?
-  mesa        Mesa             @relation(fields: [mesaId], references: [id])
-  mesaId      String           @unique // Solo una comanda activa por mesa
-  activo      Boolean          @default(true)
+  mesa        Mesa    @relation(fields: [mesaId], references: [id])
+  mesaId      String  @unique // Solo una comanda activa por mesa
+  activo      Boolean @default(true)
 
-  // Relación con User
-  userId      String
-  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  detalles    ComandaDetalle[]
+  detalles     ComandaDetalle[]
   comandaTotal ComandaTotal?
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-
-  @@index([userId])   // <-- índice
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
 }
 
 model ComandaDetalle {
-  id         String    @id @default(cuid())
-  comanda    Comanda   @relation(fields: [comandaId], references: [id], onDelete: Cascade)
-  comandaId  String
-  producto   Producto  @relation(fields: [productoId], references: [id])
-  productoId String
-  cantidad   Int       @default(1)
-  precio     Float?
+  id          String   @id @default(cuid())
+  comanda     Comanda  @relation(fields: [comandaId], references: [id], onDelete: Cascade)
+  comandaId   String
+  producto    Producto @relation(fields: [productoId], references: [id])
+  productoId  String
+  cantidad    Int      @default(1)
+  precio      Float?
   observacion String?
 }
 
@@ -72,20 +83,19 @@ model ComandaTotal {
 }
 
 model Producto {
-  id          String   @id @default(cuid())
+  id          String           @id @default(cuid())
   nombre      String?
   description String?
-  tipo        Tipo     @default(COMESTIBLE)
+  tipo        Tipo             @default(COMESTIBLE)
   dueDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
   detalles    ComandaDetalle[]
-  userId String
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Tipo {
- BEBESTIBLE
- COMESTIBLE
+  BEBESTIBLE
+  COMESTIBLE
 }
-

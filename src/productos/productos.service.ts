@@ -53,4 +53,11 @@ export class ProductosService {
     await this.prisma.producto.delete({ where: { id } });
     return { ok: true };
   }
+
+  async findAllAdmin(skip = 0, take = 20) {
+    return this.prisma.producto.findMany({
+      orderBy: { createdAt: 'desc' },
+      skip, take,
+    });
+  }
 }

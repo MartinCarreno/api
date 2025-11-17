@@ -13,12 +13,21 @@ export class AuthController {
 
     @Post('signup')
     signup(@Body() dto: SignUpDto) {
-        return this.authService.signup(dto);
+        return this.authService.signup(dto.email, dto.password, dto.nombre);
     }
 
     @Post('login')
     login(@Body() dto: LoginDto) {
-        return this.authService.login(dto);
+        return this.authService.login(dto.email, dto.password);
+    }
+
+    @Post('refresh')
+    refresh(@Body('refresh_token') token: string) {
+        return this.authService.refresh(token);
+    }
+    @Post('logout')
+    logout(@Body('refresh_token') token: string) {
+        return this.authService.logout(token);
     }
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)

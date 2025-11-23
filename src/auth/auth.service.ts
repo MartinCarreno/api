@@ -28,9 +28,9 @@ export class AuthService {
     }
     async login(email: string, password: string) {
         const user = await this.users.findByEmail(email);
-        if (!user) throw new UnauthorizedException('Invalid credentials');
+        if (!user) throw new UnauthorizedException('Email invalido');
         const ok = await bcrypt.compare(password, user.passwordHash);
-        if (!ok) throw new UnauthorizedException('Invalid credentials');
+        if (!ok) throw new UnauthorizedException('Contraseña invalida');
         const issued = await this.issueTokens(user.id, user.email, user.role as any);
         return issued.public; // { access_token, refresh_token }
     }

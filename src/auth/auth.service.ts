@@ -23,14 +23,16 @@ export class AuthService {
     }
     async signup(email: string, password: string, name?: string) {
         const user = await this.users.create(email, password, name);
-        return this.sign(user);
+        const issued = await this.issueTokens(user.id, user.email, user.role as any);
+        return issued.public; // { access_token, refresh_token }
     }
     async login(email: string, password: string) {
         const user = await this.users.findByEmail(email);
         if (!user) throw new UnauthorizedException('Invalid credentials');
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) throw new UnauthorizedException('Invalid credentials');
-        return this.sign(user);
+        const issued = await this.issueTokens(user.id, user.email, user.role as any);
+        return issued.public; // { access_token, refresh_token }
     }
 
     async refresh(refreshToken: string) {

@@ -21,4 +21,4 @@ import { RolesGuard } from './guards/roles.guard';
     controllers: [AuthController],
     exports: [RolesGuard],
 })
-export class AuthModule { }
+export class AuthModule {}

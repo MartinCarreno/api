@@ -11,7 +11,7 @@ export class SignUpDto {
 
     @ApiProperty() @IsString()
     @IsOptional()
-    nombre?: string;
+    name?: string;
 
     @ApiProperty() @IsString()
     @IsOptional()

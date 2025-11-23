@@ -1,38 +1,34 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignUpDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CurrentUser } from '../auth/decorators/user.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { CurrentUser } from './decorators/user.decorator';
-
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
-
+    constructor(private auth: AuthService) { }
     @Post('signup')
     signup(@Body() dto: SignUpDto) {
-        return this.authService.signup(dto.email, dto.password, dto.nombre);
+        return this.auth.signup(dto.email, dto.password, dto.name);
     }
-
     @Post('login')
     login(@Body() dto: LoginDto) {
-        return this.authService.login(dto.email, dto.password);
+        return this.auth.login(dto.email, dto.password);
     }
-
     @Post('refresh')
     refresh(@Body('refresh_token') token: string) {
-        return this.authService.refresh(token);
+        return this.auth.refresh(token);
     }
     @Post('logout')
     logout(@Body('refresh_token') token: string) {
-        return this.authService.logout(token);
+        return this.auth.logout(token);
     }
     @ApiBearerAuth()
     @UseGuards(JwtAuthGuard)
     @Get('me')
     me(@CurrentUser() user: any) {
-        return user;
+        return user; // { sub, email }
     }
 }

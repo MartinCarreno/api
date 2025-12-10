@@ -18,6 +18,18 @@ enum Role {
   ADMIN
 }
 
+enum Tipo {
+  BEBESTIBLE
+  COMESTIBLE
+}
+
+enum ComandaEstado {
+  PENDIENTE
+  EN_PREPARACION
+  ENTREGADO
+  PAGADO
+}
+
 model User {
   id           String         @id @default(cuid())
   email        String         @unique
@@ -25,7 +37,8 @@ model User {
   passwordHash String
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
-  productos    Producto[]
+
+  comandas     Comanda[]
   role         Role           @default(USER)
   tokens       RefreshToken[]
 }
@@ -45,20 +58,25 @@ model RefreshToken {
 model Mesa {
   id         String   @id @default(cuid())
   numeroMesa Int      @unique
-  comanda    Comanda? // Relación 1:1 con la comanda activa
+  capacidad  Int?
+  comanda    Comanda[] // Relación 1:n con la comanda activa para el historial
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
 
 model Comanda {
   id          String  @id @default(cuid())
+  estado      ComandaEstado @default(PENDIENTE)
   description String?
   mesa        Mesa    @relation(fields: [mesaId], references: [id])
-  mesaId      String  @unique // Solo una comanda activa por mesa
-  activo      Boolean @default(true)
+  mesaId      String  
+
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
 
   detalles     ComandaDetalle[]
-  comandaTotal ComandaTotal?
+  total         Float    @default(0)
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 }
@@ -70,16 +88,8 @@ model ComandaDetalle {
   producto    Producto @relation(fields: [productoId], references: [id])
   productoId  String
   cantidad    Int      @default(1)
-  precio      Float?
+  precioUnitario     Float? //precio para guardar cuanto costo en el momento de la comanda
   observacion String?
-}
-
-model ComandaTotal {
-  id        String   @id @default(cuid())
-  comanda   Comanda  @relation(fields: [comandaId], references: [id])
-  comandaId String   @unique
-  total     Float    @default(0)
-  updatedAt DateTime @updatedAt
 }
 
 model Producto {
@@ -87,15 +97,13 @@ model Producto {
   nombre      String?
   description String?
   tipo        Tipo             @default(COMESTIBLE)
+  precio      Float // precio Base del producto
+  activo Boolean        @default(true)
   dueDate     DateTime?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
   detalles    ComandaDetalle[]
-  userId      String
-  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
 }
 
-enum Tipo {
-  BEBESTIBLE
-  COMESTIBLE
-}
+

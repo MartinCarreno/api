@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsEnum, IsNotEmpty, IsOptional, IsString, IsNumber, Min } from 'class-validator';
 import { TipoValues } from './tipo';
 import type {Tipo} from './tipo';
 
@@ -10,6 +10,8 @@ export class CreateProductoDto {
     @IsOptional()
     @IsEnum(TipoValues)
     tipo?: Tipo = 'COMESTIBLE';
+    @ApiProperty() @IsNumber() @Min(0) precio: number;
+    
     @ApiProperty({ required: false }) @IsOptional() @IsDateString() dueDate?:string;
 
 }

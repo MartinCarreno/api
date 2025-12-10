@@ -6,6 +6,8 @@ import { PrismaModule } from './prisma.module';
 import { ProductosModule } from './productos/productos.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { MesasModule } from './mesas/mesas.module';
+import { ComandasModule } from './comandas/comandas.module';
 
 
 @Module({
@@ -15,6 +17,8 @@ import { AuthModule } from './auth/auth.module';
     ProductosModule,
     UsersModule,
     AuthModule,
+    MesasModule,
+    ComandasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,4 +1,4 @@
-import { Injectable, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateMesaDto } from './dto/create-mesa.dto';
 
@@ -15,6 +15,33 @@ export class MesasService {
 
     return this.prisma.mesa.create({ data: dto });
   }
+
+  async liberarMesa(id: string) {
+  const mesa = await this.prisma.mesa.findUnique({ where: { id } });
+  if (!mesa) throw new NotFoundException('Mesa no encontrada');
+
+  // Buscar la última comanda pendiente o entregada de la mesa
+  const ultimaComanda = await this.prisma.comanda.findFirst({
+    where: {
+      mesaId: id,
+      estado: { in: ['PENDIENTE', 'EN_PREPARACION', 'ENTREGADO'] },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (ultimaComanda) {
+    await this.prisma.comanda.update({
+      where: { id: ultimaComanda.id },
+      data: { estado: 'PAGADO' },
+    });
+  }
+
+  // Liberar la mesa
+  return this.prisma.mesa.update({
+    where: { id },
+    data: { usada: false },
+  });
+}
 
   findAll() {
     return this.prisma.mesa.findMany({

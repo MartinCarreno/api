@@ -12,4 +12,20 @@ export class CreateMesaDto {
   @IsOptional()
   @Min(1)
   capacidad?: number;
+
+  @ApiProperty({ required: false, default: false })
+  @IsOptional()
+  usada?: boolean;
+
+  @ApiProperty({ required: false, default: 0 })
+  @IsInt()
+  @IsOptional()
+  posX?: number;
+
+  @ApiProperty({ required: false, default: 0 })
+  @IsInt()
+  @IsOptional()
+  posY?: number;
+
+
 }

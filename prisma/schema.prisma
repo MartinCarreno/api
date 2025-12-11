@@ -59,6 +59,11 @@ model Mesa {
   id         String   @id @default(cuid())
   numeroMesa Int      @unique
   capacidad  Int?
+  usada      Boolean  @default(false)
+  // Coordenadas para el frontend
+  posX       Int      @default(0)
+  posY       Int      @default(0)
+
   comanda    Comanda[] // Relación 1:n con la comanda activa para el historial
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

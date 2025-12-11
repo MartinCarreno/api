@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, Patch, Param } from '@nestjs/common';
 import { ComandasService } from './comandas.service';
 import { CreateComandaDto } from './dto/create-comanda.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -21,6 +21,14 @@ export class ComandasController {
     // AQUÍ USAMOS TU ESTRUCTURA: req.user.sub es el ID
     const userId = req.user.sub; 
     return this.comandasService.create(userId, createComandaDto);
+  }
+
+  @Patch(':id')
+  async updateComanda(
+    @Param('id') id: string,
+    @Body() body: { detalles: { productoId: string; cantidad: number }[] }
+  ) {
+    return this.comandasService.updateComanda(id, body.detalles);
   }
 
   // Ver todas las comandas (Cocina, Caja, Admin)

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, UseGuards } from '@nestjs/common';
 import { MesasService } from './mesas.service';
 import { CreateMesaDto } from './dto/create-mesa.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -19,6 +19,11 @@ export class MesasController {
   @Roles(Role.ADMIN)
   create(@Body() createMesaDto: CreateMesaDto) {
     return this.mesasService.create(createMesaDto);
+  }
+
+  @Patch(':id/liberar')
+  async liberarMesa(@Param('id') id: string) {
+    return this.mesasService.liberarMesa(id);
   }
 
   // TODOS (Admin y Garzones): Ver mesas disponibles
